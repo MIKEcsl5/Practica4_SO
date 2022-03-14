@@ -2,6 +2,7 @@ package Procesos;
 import Opciones_procesos.*;
 
 public class PROCESOS{
+    
     /*Variables referentes a los atributos de un proceso*/
     public int id_process, num_instructions, size_process, opcion, num_instructions_executed;
     public int Dir_base, Dir_limite;
