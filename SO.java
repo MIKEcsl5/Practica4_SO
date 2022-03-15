@@ -33,7 +33,7 @@ public class SO {
     /*El usuario indicará el nombre del nuevo proceso, a este se le asignará de forma automática un ID, N° de instrucciones
     * N° de espacios en memoria, además de que se agregará a la cola de procesos*/
     public static void MENU_PROCESOS(){
-        int id_process, instructions, Dir_base, size_memory, Dir_limite, opcion, id_search;
+        int id_process, instructions, size_memory, opcion, id_search;
         String nombre, Estado="Innactivo", name_search;
         PROCESOS proceso=new PROCESOS(), head=new PROCESOS(), new_process=new PROCESOS();
         char Eleccion='a';
@@ -64,8 +64,10 @@ public class SO {
                     name_search=Teclado.nextLine();
                     for (int contador=0; contador<Cola_Procesos.size(); contador++) {
                         proceso=Cola_Procesos.element();
-                        if(proceso.Estado.compareTo("Activo")==0)
+                        if(proceso.Estado.compareTo("Activo")==0&&proceso.process.getName().compareTo(name_search)!=0)
                             head=proceso;
+                        else
+                            head=new PROCESOS("");
                         if(proceso.process.getName().compareTo(name_search)==0&&proceso.id_process==id_search) {
                             ELIMINAR_PROCESOS(proceso);
                             break;
@@ -76,10 +78,14 @@ public class SO {
                     }
                     for (int contador=0; contador<Cola_Procesos.size(); contador++){
                         proceso=Cola_Procesos.element();
-                        if(proceso.Estado.compareTo("Activo")==0&&proceso.process.getName().compareTo(head.process.getName())!=0&&proceso.id_process!=head.id_process)
-                            proceso.Estado="Inactivo";
-                        if(proceso.Estado.compareTo("Activo")!=0)
-                            Cola_Procesos.add(Cola_Procesos.poll());
+                        if(head.process.getName().compareTo("")!=0) {
+                            if (proceso.Estado.compareTo("Activo") == 0 && proceso.process.getName().compareTo(head.process.getName()) != 0 && proceso.id_process != head.id_process)
+                                proceso.Estado = "Inactivo";
+                            if (proceso.Estado.compareTo("Activo") != 0)
+                                Cola_Procesos.add(Cola_Procesos.poll());
+                            else
+                                break;
+                        }
                         else
                             break;
                     }
@@ -90,7 +96,7 @@ public class SO {
                     break;
                 case 'c':
                 case 'C':
-                    Procesos_espera_memoria.add(proceso);
+                    Procesos_espera_memoria.add(new_process);
                     break;
             }
         }
@@ -119,7 +125,7 @@ public class SO {
             instructions=NUMERO_INSTRUCCIONES();
             opcion=(int)(Math.random()*5+1);
             Dir_base=inicio;
-            Dir_limite=inicio+size_memory;
+            Dir_limite=inicio+size_memory-1;
             if(Cola_Procesos.size()==0)
                 Estado="Activo";
             else
@@ -210,23 +216,16 @@ public class SO {
                 }
             }
             else{
-                if(((k-j)+1)==size_memory){
+                if(((k-j)+1)>=size_memory){
                     regreso=true;
-                    break;
+                    return regreso;
                 }
                 else
                     tentativo=true;
             }
         }
-        if((k-j)>=size_memory)
+        if((k-j)+1>=size_memory)
             regreso=true;
-        if(regreso&&Procesos_espera_memoria.size()!=0){
-            PROCESOS proceso=Procesos_espera_memoria.poll();
-            proceso.Dir_base=j;
-            proceso.Dir_limite=k;
-            Asignacion_Memoria(proceso.process.getName(), proceso.size_process, proceso.Dir_base);
-            Cola_Procesos.add(proceso);
-        }
         return regreso;
     }
 
@@ -242,40 +241,40 @@ public class SO {
             System.out.println("\te) Ejecutar Proceso Actual\n\tf) Pasar al Proceso Siguiente");
             System.out.println("\tg) Matar Proceso Actual\n\th) Cerrar Programa\n\tElecci\u00F3n: ");
             opcion=Teclado.next().charAt(0);
-            switch (opcion){
+            switch (opcion) {
                 case 'a':
                 case 'A':
                     MENU_PROCESOS();
                     break;
                 case 'b':
                 case 'B':
-                    i=0;
-                    SizeEliminados=Procesos_Matados.size();
-                    SizeConcluidos=Procesos_Concluidos.size();
-                    System.out.println("N\u00FAmeros de Procesos en la Cola: "+Cola_Procesos.size());
+                    i = 0;
+                    SizeEliminados = Procesos_Matados.size();
+                    SizeConcluidos = Procesos_Concluidos.size();
+                    System.out.println("N\u00FAmeros de Procesos en la Cola: " + Cola_Procesos.size());
                     System.out.println("\nProcesos Eliminados\tProcesos Finalizados");
-                    do{
-                        if(i<SizeConcluidos)
-                            ListadoFinalizado=Procesos_Concluidos.get(i);
+                    do {
+                        if (i < SizeConcluidos)
+                            ListadoFinalizado = Procesos_Concluidos.get(i);
                         else
-                            ListadoFinalizado=new PROCESOS("");
-                        if(i<SizeEliminados)
-                            ListadoEliminado=Procesos_Matados.get(i);
+                            ListadoFinalizado = new PROCESOS("");
+                        if (i < SizeEliminados)
+                            ListadoEliminado = Procesos_Matados.get(i);
                         else
-                            ListadoEliminado=new PROCESOS("");
+                            ListadoEliminado = new PROCESOS("");
                         /*Imprime las dos columnas*/
-                        if(ListadoEliminado.process.getName().compareTo("")!=0&&ListadoFinalizado.process.getName().compareTo("")!=0)
-                            System.out.println(ListadoEliminado.process.getName()+"\t\t"+ListadoFinalizado.process.getName());
-                        else{
+                        if (ListadoEliminado.process.getName().compareTo("") != 0 && ListadoFinalizado.process.getName().compareTo("") != 0)
+                            System.out.println(ListadoEliminado.process.getName() + "\t\t" + ListadoFinalizado.process.getName());
+                        else {
                             /*Imprime la primera columna*/
-                            if(ListadoEliminado.process.getName().compareTo("")!=0&&ListadoFinalizado.process.getName().compareTo("")==0)
+                            if (ListadoEliminado.process.getName().compareTo("") != 0 && ListadoFinalizado.process.getName().compareTo("") == 0)
                                 System.out.println(ListadoEliminado.process.getName());
                             else
                                 /*Imprime la segunda columna*/
-                                System.out.println("\t\t\t\t\t"+ListadoFinalizado.process.getName());
+                                System.out.println("\t\t\t\t\t" + ListadoFinalizado.process.getName());
                         }
                         i++;
-                    }while(ListadoFinalizado.process.getName().compareTo("")!=0||ListadoEliminado.process.getName().compareTo("")!=0);
+                    } while (ListadoFinalizado.process.getName().compareTo("") != 0 || ListadoEliminado.process.getName().compareTo("") != 0);
                     Impresion_Memoria();
                     break;
                 case 'c':
@@ -284,25 +283,27 @@ public class SO {
                     break;
                 case 'd':
                 case 'D':
-                    proceso=Cola_Procesos.element();
+                    proceso = Cola_Procesos.element();
                     System.out.println("PROCESO ACTUAL");
-                    System.out.println("Nombre: "+proceso.process.getName()+" ID Process: "+proceso.id_process+" Instrucciones Totales: "+proceso.num_instructions);
-                    System.out.print("Instrucciones ejecutadas: "+proceso.num_instructions_executed+" Direcci\u00F3n Base: "+proceso.Dir_base);
-                    System.out.println(" Direcci\u00F3n L\u00EDmite: "+proceso.Dir_limite);
+                    System.out.println("Nombre: " + proceso.process.getName() + " ID Process: " + proceso.id_process + " Instrucciones Totales: " + proceso.num_instructions);
+                    System.out.print("Instrucciones ejecutadas: " + proceso.num_instructions_executed + " Direcci\u00F3n Base: " + proceso.Dir_base);
+                    System.out.println(" Direcci\u00F3n L\u00EDmite: " + proceso.Dir_limite);
                     break;
                 case 'e':
                 case 'E':
                     EJECUCION_PROCESOS(proceso);
-                     break;
+                    ASIGNACION_LIBERACION();
+                    break;
                 case 'f':
                 case 'F':
-                    Cola_Procesos.element().Estado="Inactivo";
+                    Cola_Procesos.element().Estado = "Inactivo";
                     Cola_Procesos.add(Cola_Procesos.poll());
-                    Cola_Procesos.element().Estado="Activo";
+                    Cola_Procesos.element().Estado = "Activo";
                     break;
                 case 'g':
                 case 'G':
                     ELIMINAR_PROCESOS(proceso);
+                    ASIGNACION_LIBERACION();
                     break;
                 case 'h':
                 case 'H':
@@ -358,24 +359,24 @@ public class SO {
                 if(impresion.id_process<1000) {
                     System.out.print("Nombre: " + impresion.process.getName() + "\t\tID Process: " + impresion.id_process + "\t\tInstrucciones restantes: ");
                     System.out.println((impresion.num_instructions - impresion.num_instructions_executed) + "\t\tEstado: " + impresion.Estado);
-                    System.out.println("Direcci\u00F3n base: "+impresion.Dir_base+"\tDirecci\u00F3n l\u00EDmite: "+(impresion.Dir_limite-1));
+                    System.out.println("Direcci\u00F3n base: "+impresion.Dir_base+"\tDirecci\u00F3n l\u00EDmite: "+(impresion.Dir_limite));
                 }
                 else{
                     System.out.print("Nombre: " + impresion.process.getName() + "\t\tID Process: " + impresion.id_process + "\tInstrucciones restantes: ");
                     System.out.println((impresion.num_instructions - impresion.num_instructions_executed) + "\t\tEstado: " + impresion.Estado);
-                    System.out.println("Direcci\u00F3n base: "+impresion.Dir_base+"\tDirecci\u00F3n l\u00EDmite: "+(impresion.Dir_limite-1));
+                    System.out.println("Direcci\u00F3n base: "+impresion.Dir_base+"\tDirecci\u00F3n l\u00EDmite: "+(impresion.Dir_limite));
                 }
             }
             else {
                 if(impresion.id_process<1000) {
                     System.out.print("Nombre: " + impresion.process.getName() + "\tID Process: " + impresion.id_process + "\t\tInstrucciones restantes: ");
                     System.out.println((impresion.num_instructions - impresion.num_instructions_executed) + "\t\tEstado: " + impresion.Estado);
-                    System.out.println("Direcci\u00F3n base: "+impresion.Dir_base+"\tDirecci\u00F3n l\u00EDmite: "+(impresion.Dir_limite-1));
+                    System.out.println("Direcci\u00F3n base: "+impresion.Dir_base+"\tDirecci\u00F3n l\u00EDmite: "+(impresion.Dir_limite));
                 }
                 else{
                     System.out.print("Nombre: " + impresion.process.getName() + "\tID Process: " + impresion.id_process + "\tInstrucciones restantes: ");
                     System.out.println((impresion.num_instructions - impresion.num_instructions_executed) + "\t\tEstado: " + impresion.Estado);
-                    System.out.println("Direcci\u00F3n base: "+impresion.Dir_base+"\tDirecci\u00F3n l\u00EDmite: "+(impresion.Dir_limite-1));
+                    System.out.println("Direcci\u00F3n base: "+impresion.Dir_base+"\tDirecci\u00F3n l\u00EDmite: "+(impresion.Dir_limite));
                 }
             }
             System.out.println();
@@ -387,8 +388,10 @@ public class SO {
         proceso=Cola_Procesos.poll();
         proceso.Estado="Eliminado";
         Procesos_Matados.add(proceso);
-        for(int j=proceso.Dir_base; j< proceso.Dir_limite; j++)
-            MEMORIA[j]="";
+        for(int j=proceso.Dir_base; j<=proceso.Dir_limite; j++) {
+            if(j!=2048)
+                MEMORIA[j] = "";
+        }
         System.out.print("\nEl proceso eliminado le faltaban: "+(proceso.num_instructions-proceso.num_instructions_executed));
         System.out.println(" instrucciones para terminar su ejecuci\u00F3n");
         Cola_Procesos.element().Estado="Activo";
@@ -409,5 +412,31 @@ public class SO {
             Cola_Procesos.add(proceso);
             Cola_Procesos.element().Estado="Activo";
         }
+    }
+
+    /*Cuando se libera la memoria durante la ejecución de un proceso (fuera de la creación de uno), o sea en el método
+    * MENU_SO(), o la eliminación de uno este método nos ayudará a revisar toda la cola de procesos en espera para ver
+    * si uno o varios pueden pasar a la cola de procesos y ocupar espacio en memoria*/
+    public static void ASIGNACION_LIBERACION(){
+        int i;
+        PROCESOS proceso;
+        boolean espacio=false;
+
+        for (i = 0; i < Procesos_espera_memoria.size(); i++) {
+            proceso = Procesos_espera_memoria.element();
+            if (Espacio_Suficiente(proceso.size_process)) {
+                proceso = Procesos_espera_memoria.poll();
+                System.out.println("El proceso " + proceso.process.getName() + ", que se encontraba en espera, se pudo crear con \u00E9xito, se ha agregado a la cola y a la memoria.");
+                proceso.Dir_base = j;
+                proceso.Dir_limite = j + proceso.size_process - 1;
+                Cola_Procesos.add(proceso);
+                Asignacion_Memoria(proceso.process.getName(), proceso.size_process, proceso.Dir_base);
+                espacio = true;
+                i=0;
+            } else
+                Procesos_espera_memoria.add(Procesos_espera_memoria.poll());
+        }
+        if (!espacio&&!Procesos_espera_memoria.isEmpty())
+            System.out.println("A\u00FAn no hay espacio suficiente para agregar los procesos en espera.");
     }
 }
