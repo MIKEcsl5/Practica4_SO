@@ -1,26 +1,30 @@
 package Procesos;
 import Opciones_procesos.*;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+
 public class PROCESOS{
-    
     /*Variables referentes a los atributos de un proceso*/
     public int id_process, num_instructions, size_process, opcion, num_instructions_executed;
-    public int Dir_base, Dir_limite;
+    //public int Dir_base, Dir_limite;
+    public LinkedList<ArrayList<String>> Paginas=new LinkedList<>();
     public Thread process;
     public String Estado;
 
     /*Constructor con la creación de un Proceso con sus atributos*/
-    public PROCESOS(String name_process, int id_process, int num_instructions, int size_process, int opcion, int Dir_base, int Dir_limite,
+    public PROCESOS(String name_process, int id_process, int num_instructions, LinkedList<ArrayList<String>> size_process, int opcion, int Dir_base, int Dir_limite,
     String Estado){
         process=new Thread(name_process);
         this.id_process=id_process;
         this.num_instructions=num_instructions;
-        this.size_process=size_process;
+        this.Paginas=size_process;
         this.opcion=opcion;
         num_instructions_executed=0;
-        this.Dir_base=Dir_base;
-        this.Dir_limite=Dir_limite;
+        //this.Dir_base=Dir_base;
+        //this.Dir_limite=Dir_limite;
         this.Estado=Estado;
+
     }
 
     /*Constructor vacío*/
